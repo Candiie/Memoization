@@ -39,7 +39,7 @@ Coin* coinsInfo[NUMOFCOINS_DENOM_INFO] = { c1, c2, c3 };
 
 
 //Table for memoization - assiume max no. of n and max weight 
-int cachedSavings [MAX_N][MAX_WEIGHT] = {0};
+int cachedSavings [MAX_N][MAX_WEIGHT] = {-1};
 
 //Declaring prototype 
 int computeMinSavings (int n , int weight);
@@ -50,7 +50,7 @@ void main (void) {
 	
 
 	//Input from User
-	int inN = 4;
+	int inN = 3;
 	int inWeight = 60;
 
 	cout << computeMinSavings(inN, inWeight) << endl;
@@ -66,12 +66,22 @@ int computeMinSavings (int n , int weight){
 	int coinsUsed = 0;
 
 
+	//Search cached table (memoization)
+	if(cachedSavings[n][weight] != -1 && cachedSavings[n][weight] != NULL ) {
+		return cachedSavings[n][weight]; //return cached results via memoization implementation
+	}
+
 	while (coinsUsed <= n) {
 
 		if(tempWeight == 0) {
 			break;
 		}
 
+		if(coinInfoCounter >= NUMOFCOINS_DENOM_INFO ) {
+			break;
+		}
+
+		//If after next coin still got weight remaining but maxing out n
 		if ( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) > 0 ) && ( (coinsUsed + 1) >= n) ) {
 			coinInfoCounter += 1;
 			continue; //move on to next loop
@@ -79,18 +89,11 @@ int computeMinSavings (int n , int weight){
 
 		if( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) >= 0 ) && ( (coinsUsed + 1) <= n)) {
 
-			tempWeight -= coinsInfo[coinInfoCounter]->weight; //Lols! tempWeight /= coinsInfo[coinInfoCounter]->weight;
+			tempWeight -= coinsInfo[coinInfoCounter]->weight;
 			minCalcSavings += coinsInfo[coinInfoCounter]->value;
 			coinsUsed += 1;
-		}
-		//If number of coinsUser is still within given no. of coins increase coinCounter to use next type of coin
-		/*else if (( tempWeight - coinsInfo[coinInfoCounter]->weight < 0 ) && ( (coinsUsed + 1) < n)) {
-			coinInfoCounter += 1;
-		}
-		else {
-			cout << "I came here" << endl;
-			return 0;
-		}*/else {
+
+		}else {
 			if((coinInfoCounter + 1) < NUMOFCOINS_DENOM_INFO) {
 				coinInfoCounter += 1;
 			}else{
@@ -100,13 +103,13 @@ int computeMinSavings (int n , int weight){
 	}
 
 
+	//Meaning achieved weight with exactly n coins
 	if(tempWeight == 0) {
 
-		
-
-		return minCalcSavings; // 0 means no possible combination
+		cachedSavings [n][weight] = minCalcSavings; //cache table for memoization
+		return minCalcSavings; 
 	}
 
 
-	return 0;
+	return 0; // 0 means no possible combination
 }
