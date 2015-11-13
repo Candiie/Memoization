@@ -44,61 +44,75 @@ int cachedSavings [MAX_N][MAX_WEIGHT] = {-1};
 
 //Declaring prototype 
 //int computeMinSavings (int n , int weight);
-int computeMinSavings (int weight);
+int computeMinSavings (int weight, int coindenomcount, int mincalcsavings = 0);
 
 void main (void) {
 	
 	//Input from User
 	int inN = 3;
-	int inWeight = 70;
+	int inWeight = 90;
 
-	cout << computeMinSavings(inWeight) << endl;
+	cout << computeMinSavings(inWeight,0) << endl;
 
 }
 
-int computeMinSavings (int weight) {
+
+const int NUMOFCOINS_COINCOUNTER = 100; //assume in piggy max 100 coins
+
+//Table to store the weight 
+//vector<int> cachedCoinToDenominationWeight [NUMOFCOINS_DENOM_INFO];
+int cachedCoinToDenominationWeight [NUMOFCOINS_COINCOUNTER][NUMOFCOINS_DENOM_INFO];
+
+int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 	
-	int mincalcsavings = 0; //mininum calculated savings
+	//int mincalcsavings = 0; //mininum calculated savings
 	int coininfocounter = 0;
 	int tempweight = weight;
-
-	const int NUMOFCOINS_COINCOUNTER = 100; //assume in piggy max 100 coins
-
-	//Table to store the weight 
-	//vector<int> cachedCoinToDenominationWeight [NUMOFCOINS_DENOM_INFO];
-	int cachedCoinToDenominationWeight [NUMOFCOINS_COINCOUNTER][NUMOFCOINS_DENOM_INFO];
+	int revertCount = 0;
 
 
-	for(int i = 0; i < NUMOFCOINS_DENOM_INFO; i++) {
+	//return the min savings calculated at anytime the temp weight = 0;
+	if(tempweight == 0) { 
+		return mincalcsavings; 
+	}
 
-		//return the min savings calculated at anytime the temp weight = 0;
-		if(tempweight == 0) { return mincalcsavings; }
+	if(tempweight < 0) { 
+		return 0; 
+	}
 
-		while(tempweight > 0) {
+	while(tempweight > 0) {
 			
-			if ( (tempweight - coinsInfo[i]->weight) >= 0 ) {
+		if ( (tempweight - coinsInfo[coindenomcount]->weight) >= 0 ) {
 
-				int weightDecreased = (coininfocounter + 1) * coinsInfo[i]->weight;
+			int weightDecreased = (coininfocounter + 1) * coinsInfo[coindenomcount]->weight;
 
-				tempweight -= weightDecreased;
-				mincalcsavings += coinsInfo[i]->value;
+			tempweight -= weightDecreased;
+			mincalcsavings += coinsInfo[coindenomcount]->value;
 
-				//return the min savings calculated at anytime the temp weight = 0;
-				if(tempweight == 0) { return mincalcsavings; }
+			//return the min savings calculated at anytime the temp weight = 0;
+			if(tempweight == 0) { return mincalcsavings; }
 
-				//store results for memoization
-				cachedCoinToDenominationWeight [coininfocounter][NUMOFCOINS_DENOM_INFO] = weightDecreased;
+			//store results for memoization
+			cachedCoinToDenominationWeight [coininfocounter][coindenomcount] = weightDecreased;
+
+			
+			if( (tempweight - coinsInfo[coindenomcount]->weight) >= 0 ) {
+
+				return computeMinSavings(tempweight, coindenomcount, mincalcsavings);
 			}
-			else {
 
-				//increment coin counter
-				coininfocounter ++;
-				break;
-			}
+
+			return computeMinSavings(tempweight += weightDecreased, coindenomcount+1, mincalcsavings -= coinsInfo[coindenomcount]->value);
+		}
+		else {
+
+			//increment coin counter
+			coininfocounter++;
+			revertCount++;
+			break;
 		}
 	}
 
-	return 0;
 	
 	//while(tempweight > 0) {
 
