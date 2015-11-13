@@ -50,14 +50,14 @@ void main (void) {
 	
 	//Input from User
 	int inN = 3;
-	int inWeight = 90;
+	int inWeight = 70;
 
-	cout << computeMinSavings(inWeight,0) << endl;
+	cout << computeMinSavings(inWeight, 0) << endl;
 
 }
 
 
-const int NUMOFCOINS_COINCOUNTER = 100; //assume in piggy max 100 coins
+const int NUMOFCOINS_COINCOUNTER = 10000; //assume in piggy max 100 coins
 
 //Table to store the weight 
 //vector<int> cachedCoinToDenominationWeight [NUMOFCOINS_DENOM_INFO];
@@ -68,8 +68,8 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 	//int mincalcsavings = 0; //mininum calculated savings
 	int coininfocounter = 0;
 	int tempweight = weight;
-	int revertCount = 0;
-
+	//int revertCount = 0;
+	int weightDecreased = 0;
 
 	//return the min savings calculated at anytime the temp weight = 0;
 	if(tempweight == 0) { 
@@ -84,7 +84,15 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 			
 		if ( (tempweight - coinsInfo[coindenomcount]->weight) >= 0 ) {
 
-			int weightDecreased = (coininfocounter + 1) * coinsInfo[coindenomcount]->weight;
+
+			if(cachedCoinToDenominationWeight [coininfocounter][coindenomcount] != -1 
+				&& cachedCoinToDenominationWeight [coininfocounter][coindenomcount] != NULL){
+
+					weightDecreased = cachedCoinToDenominationWeight [coininfocounter][coindenomcount];
+			}
+			else{
+				weightDecreased = (coininfocounter + 1) * coinsInfo[coindenomcount]->weight;
+			}
 
 			tempweight -= weightDecreased;
 			mincalcsavings += coinsInfo[coindenomcount]->value;
@@ -108,7 +116,7 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 
 			//increment coin counter
 			coininfocounter++;
-			revertCount++;
+			//revertCount++;
 			break;
 		}
 	}
