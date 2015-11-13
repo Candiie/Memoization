@@ -44,7 +44,7 @@ int cachedSavings [MAX_N][MAX_WEIGHT] = {-1};
 
 //Declaring prototype 
 //int computeMinSavings (int n , int weight);
-int computeMinSavings (int weight, int coindenomcount, int mincalcsavings = 0);
+int computeMinSavings (int weight, int coindenomcount, int mincalcsavings = 0, bool invalidCase = false);
 
 void main (void) {
 	
@@ -63,7 +63,7 @@ const int NUMOFCOINS_COINCOUNTER = 10000; //assume in piggy max 100 coins
 //vector<int> cachedCoinToDenominationWeight [NUMOFCOINS_DENOM_INFO];
 int cachedCoinToDenominationWeight [NUMOFCOINS_COINCOUNTER][NUMOFCOINS_DENOM_INFO];
 
-int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
+int computeMinSavings (int weight, int coindenomcount, int mincalcsavings, bool invalidCase) {
 	
 	//int mincalcsavings = 0; //mininum calculated savings
 	int coininfocounter = 0;
@@ -80,7 +80,7 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 		return 0; 
 	}
 
-	while(tempweight > 0) {
+	//while(tempweight > 0) {
 			
 		if ( (tempweight - coinsInfo[coindenomcount]->weight) >= 0 ) {
 
@@ -112,14 +112,16 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 
 			return computeMinSavings(tempweight += weightDecreased, coindenomcount+1, mincalcsavings -= coinsInfo[coindenomcount]->value);
 		}
-		else {
+		//else {
 
-			//increment coin counter
-			coininfocounter++;
-			//revertCount++;
-			break;
-		}
-	}
+		//	//increment coin counter
+		//	coininfocounter++;
+		//	//revertCount++;
+		//	break;
+		//}
+	//	mincalcsavings = 0; //set to 0
+	//	break;
+//	}
 
 	
 	//while(tempweight > 0) {
@@ -137,6 +139,8 @@ int computeMinSavings (int weight, int coindenomcount, int mincalcsavings) {
 	//		}
 	//	}
 	//}
+
+	return 0;
 }
 
 //int computeMinSavings (int n , int weight){
