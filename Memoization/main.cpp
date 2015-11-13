@@ -1,5 +1,6 @@
 
 #include<iostream>
+#include<vector>
 
 using namespace std;
 
@@ -30,9 +31,9 @@ class Coin {
 };
 
 //Init coin values
-Coin* c1 = new Coin(1,10);
-Coin* c2 = new Coin(2,20);
-Coin* c3 = new Coin(3,30);
+Coin* c1 = new Coin(2,20);
+Coin* c2 = new Coin(3,30);
+Coin* c3 = new Coin(4,40);
 
 //Assuming Value and Weights are sorted from lowest value to highest value are input and stored in a table
 Coin* coinsInfo[NUMOFCOINS_DENOM_INFO] = { c1, c2, c3 };
@@ -42,74 +43,132 @@ Coin* coinsInfo[NUMOFCOINS_DENOM_INFO] = { c1, c2, c3 };
 int cachedSavings [MAX_N][MAX_WEIGHT] = {-1};
 
 //Declaring prototype 
-int computeMinSavings (int n , int weight);
-
+//int computeMinSavings (int n , int weight);
+int computeMinSavings (int weight);
 
 void main (void) {
 	
-	
-
 	//Input from User
 	int inN = 3;
-	int inWeight = 60;
+	int inWeight = 70;
 
-	cout << computeMinSavings(inN, inWeight) << endl;
+	cout << computeMinSavings(inWeight) << endl;
 
 }
 
+int computeMinSavings (int weight) {
+	
+	int mincalcsavings = 0; //mininum calculated savings
+	int coininfocounter = 0;
+	int tempweight = weight;
 
-int computeMinSavings (int n , int weight){
+	const int NUMOFCOINS_COINCOUNTER = 100; //assume in piggy max 100 coins
 
-	int minCalcSavings = 0; //mininum calculated savings
-	int coinInfoCounter = 0;
-	int tempWeight = weight;
-	int coinsUsed = 0;
+	//Table to store the weight 
+	//vector<int> cachedCoinToDenominationWeight [NUMOFCOINS_DENOM_INFO];
+	int cachedCoinToDenominationWeight [NUMOFCOINS_COINCOUNTER][NUMOFCOINS_DENOM_INFO];
 
 
-	//Search cached table (memoization)
-	if(cachedSavings[n][weight] != -1 && cachedSavings[n][weight] != NULL ) {
-		return cachedSavings[n][weight]; //return cached results via memoization implementation
-	}
+	for(int i = 0; i < NUMOFCOINS_DENOM_INFO; i++) {
 
-	while (coinsUsed <= n) {
+		//return the min savings calculated at anytime the temp weight = 0;
+		if(tempweight == 0) { return mincalcsavings; }
 
-		if(tempWeight == 0) {
-			break;
-		}
+		while(tempweight > 0) {
+			
+			if ( (tempweight - coinsInfo[i]->weight) >= 0 ) {
 
-		if(coinInfoCounter >= NUMOFCOINS_DENOM_INFO ) {
-			break;
-		}
+				int weightDecreased = (coininfocounter + 1) * coinsInfo[i]->weight;
 
-		//If after next coin still got weight remaining but maxing out n
-		if ( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) > 0 ) && ( (coinsUsed + 1) >= n) ) {
-			coinInfoCounter += 1;
-			continue; //move on to next loop
-		}
+				tempweight -= weightDecreased;
+				mincalcsavings += coinsInfo[i]->value;
 
-		if( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) >= 0 ) && ( (coinsUsed + 1) <= n)) {
+				//return the min savings calculated at anytime the temp weight = 0;
+				if(tempweight == 0) { return mincalcsavings; }
 
-			tempWeight -= coinsInfo[coinInfoCounter]->weight;
-			minCalcSavings += coinsInfo[coinInfoCounter]->value;
-			coinsUsed += 1;
+				//store results for memoization
+				cachedCoinToDenominationWeight [coininfocounter][NUMOFCOINS_DENOM_INFO] = weightDecreased;
+			}
+			else {
 
-		}else {
-			if((coinInfoCounter + 1) < NUMOFCOINS_DENOM_INFO) {
-				coinInfoCounter += 1;
-			}else{
+				//increment coin counter
+				coininfocounter ++;
 				break;
 			}
 		}
 	}
 
+	return 0;
+	
+	//while(tempweight > 0) {
 
-	//Meaning achieved weight with exactly n coins
-	if(tempWeight == 0) {
+	//	for(int i = 0; i < NUMOFCOINS_DENOM_INFO; i++){
+	//		
+	//		bool contLoop = true;
 
-		cachedSavings [n][weight] = minCalcSavings; //cache table for memoization
-		return minCalcSavings; 
-	}
+	//		while(contLoop){
 
 
-	return 0; // 0 means no possible combination
+
+	//			coininfocounter ++;
+
+	//		}
+	//	}
+	//}
 }
+
+//int computeMinSavings (int n , int weight){
+//
+//	int minCalcSavings = 0; //mininum calculated savings
+//	int coinInfoCounter = 0;
+//	int tempWeight = weight;
+//	int coinsUsed = 0;
+//
+//
+//	//Search cached table (memoization)
+//	if(cachedSavings[n][weight] != -1 && cachedSavings[n][weight] != NULL ) {
+//		return cachedSavings[n][weight]; //return cached results via memoization implementation
+//	}
+//
+//	while (coinsUsed <= n) {
+//
+//		if(tempWeight == 0) {
+//			break;
+//		}
+//
+//		if(coinInfoCounter >= NUMOFCOINS_DENOM_INFO ) {
+//			break;
+//		}
+//
+//		//If after next coin still got weight remaining but maxing out n
+//		if ( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) > 0 ) && ( (coinsUsed + 1) >= n) ) {
+//			coinInfoCounter += 1;
+//			continue; //move on to next loop
+//		}
+//
+//		if( ( (tempWeight - coinsInfo[coinInfoCounter]->weight) >= 0 ) && ( (coinsUsed + 1) <= n)) {
+//
+//			tempWeight -= coinsInfo[coinInfoCounter]->weight;
+//			minCalcSavings += coinsInfo[coinInfoCounter]->value;
+//			coinsUsed += 1;
+//
+//		}else {
+//			if((coinInfoCounter + 1) < NUMOFCOINS_DENOM_INFO) {
+//				coinInfoCounter += 1;
+//			}else{
+//				break;
+//			}
+//		}
+//	}
+//
+//
+//	//Meaning achieved weight with exactly n coins
+//	if(tempWeight == 0) {
+//
+//		cachedSavings [n][weight] = minCalcSavings; //cache table for memoization
+//		return minCalcSavings; 
+//	}
+//
+//
+//	return 0; // 0 means no possible combination
+//}
